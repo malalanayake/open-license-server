@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Open-License-App</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" />
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1>Application User Configuration</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-lg-6">
+            <form th:object="${appUserNew}" method="POST">
+                <div class="form-group">
+                    <label for="userName">AppUser to insert</label>
+                    <input id="userName" type="text" class="form-control" placeholder="User Name" th:field="*{userName}" />
+                    <input id="passWord" type="password" class="form-control" placeholder="Password" th:field="*{passWord}" />
+                </div>
+                <button type="submit" class="btn btn-default">CREATE NEW APP USER</button>
+            </form>
+        </div>
+    </div>
+
+    <hr />
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Application Users</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="appUser : ${appUserList}">
+                        <td th:text="${appUser.userName}">UserName Text</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</body>
+</html>
