@@ -24,7 +24,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 	@Autowired
 	ContextConfig contextConfig;
 
-	// Have to put the SPRING_BROKER_ENABLE property
+	//TODO: Have to put the ENABLE_SIMPLE_BROKER property
 	boolean enableSimpleBroker = true;
 	// Set the value of the "host" header to use in STOMP CONNECT frames
 	String brokerVirtualHost = "";
