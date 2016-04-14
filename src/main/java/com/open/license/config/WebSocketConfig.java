@@ -25,7 +25,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 	ContextConfig contextConfig;
 
 	//TODO: Have to put the ENABLE_SIMPLE_BROKER property
-	boolean enableSimpleBroker = true;
+	boolean enableSimpleBroker = false;
 	// Set the value of the "host" header to use in STOMP CONNECT frames
 	String brokerVirtualHost = "";
 

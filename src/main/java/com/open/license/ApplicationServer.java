@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import com.open.license.config.ContextConfig;
+import com.open.license.config.RouteConfig;
 
 /**
  * 
@@ -20,11 +21,11 @@ import com.open.license.config.ContextConfig;
 @Configuration
 @ComponentScan
 @EnableAutoConfiguration
-@Import({ ContextConfig.class })
-public class Application {
+@Import({ ContextConfig.class, RouteConfig.class})
+public class ApplicationServer {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+		SpringApplication.run(ApplicationServer.class, args);
 	}
 
 }

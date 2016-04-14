@@ -3,18 +3,22 @@ package com.open.license.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jms.ConnectionFactory;
 import javax.sql.DataSource;
 
 import org.apache.activemq.broker.BrokerPlugin;
 import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.jms.pool.PooledConnectionFactory;
 import org.apache.activemq.security.AuthenticationUser;
 import org.apache.activemq.security.SimpleAuthenticationPlugin;
+import org.apache.activemq.spring.ActiveMQConnectionFactory;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jms.connection.JmsTransactionManager;
 
 /**
  * 
@@ -28,6 +32,9 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration
 public class ContextConfig {
 
+	private static final String ROLES = "admins,publishers,consumers";
+	private static final String STOMP = "stomp";
+	private static final String TCP = "tcp";
 	private Logger log = Logger.getLogger(getClass().getName());
 	public final String APP_ENV;
 	public final String DATASOURCE_URL;
@@ -37,6 +44,8 @@ public class ContextConfig {
 	public final String ACTIVEMQ_HOST_NAME;
 	public final String ACTIVEMQ_TCP_PORT;
 	public final String ACTIVEMQ_STOMP_PORT;
+	public final String ACTIVEMQ_USER_NAME;
+	public final String ACTIVEMQ_PASSWORD;
 
 	public ContextConfig() {
 		APP_ENV = System.getProperty("APP_ENV");
@@ -49,6 +58,8 @@ public class ContextConfig {
 		ACTIVEMQ_HOST_NAME = System.getProperty("ACTIVEMQ_HOST_NAME");
 		ACTIVEMQ_TCP_PORT = System.getProperty("ACTIVEMQ_TCP_PORT");
 		ACTIVEMQ_STOMP_PORT = System.getProperty("ACTIVEMQ_STOMP_PORT");
+		ACTIVEMQ_USER_NAME = System.getProperty("ACTIVEMQ_USER_NAME");
+		ACTIVEMQ_PASSWORD = System.getProperty("ACTIVEMQ_PASSWORD");
 	}
 
 	@Bean
@@ -65,6 +76,31 @@ public class ContextConfig {
 		// Start ActiveMQ Broker if enabled
 		startActiveMqBroker();
 		return configurer;
+	}
+
+	@Bean
+	public ConnectionFactory amqConnectionFactory() {
+		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
+		factory.setBrokerURL("failover:(" + TCP + "://" + ACTIVEMQ_HOST_NAME + ":" + ACTIVEMQ_TCP_PORT
+				+ "?closeAsync=false)?randomize=false");
+		factory.setUserName(ACTIVEMQ_USER_NAME);
+		factory.setPassword(ACTIVEMQ_PASSWORD);
+		return factory;
+	}
+
+	@Bean
+	public ConnectionFactory connectionFactory() {
+		PooledConnectionFactory factory = new PooledConnectionFactory();
+		factory.setMaxConnections(3);
+		factory.setConnectionFactory(amqConnectionFactory());
+		return factory;
+	}
+
+	@Bean
+	public JmsTransactionManager JmsTransactionManager() {
+		JmsTransactionManager manager = new JmsTransactionManager();
+		manager.setConnectionFactory(amqConnectionFactory());
+		return manager;
 	}
 
 	@Bean
@@ -87,12 +123,12 @@ public class ContextConfig {
 				SimpleAuthenticationPlugin authentication = new SimpleAuthenticationPlugin();
 
 				List<AuthenticationUser> users = new ArrayList<AuthenticationUser>();
-				users.add(new AuthenticationUser("admin", "admin", "admins,publishers,consumers"));
+				users.add(new AuthenticationUser(ACTIVEMQ_USER_NAME, ACTIVEMQ_PASSWORD, ROLES));
 				authentication.setUsers(users);
 				broker.setPlugins(new BrokerPlugin[] { authentication });
 
-				broker.addConnector("tcp://" + ACTIVEMQ_HOST_NAME + ":" + ACTIVEMQ_TCP_PORT);
-				broker.addConnector("stomp://" + ACTIVEMQ_HOST_NAME + ":" + ACTIVEMQ_STOMP_PORT);
+				broker.addConnector(TCP + "://" + ACTIVEMQ_HOST_NAME + ":" + ACTIVEMQ_TCP_PORT);
+				broker.addConnector(STOMP + "://" + ACTIVEMQ_HOST_NAME + ":" + ACTIVEMQ_STOMP_PORT);
 				broker.start();
 			} catch (Exception e) {
 				e.printStackTrace();

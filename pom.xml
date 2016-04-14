@@ -223,7 +223,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>com.open.license.Application</mainClass>
+							<mainClass>com.open.license.ApplicationServer</mainClass>
 						</manifest>
 						<manifestEntries>
 							<Class-Path>./</Class-Path>
