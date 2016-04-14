@@ -91,7 +91,7 @@ public class ContextConfig {
 				authentication.setUsers(users);
 				broker.setPlugins(new BrokerPlugin[] { authentication });
 
-				broker.addConnector("http://" + ACTIVEMQ_HOST_NAME + ":" + ACTIVEMQ_TCP_PORT);
+				broker.addConnector("tcp://" + ACTIVEMQ_HOST_NAME + ":" + ACTIVEMQ_TCP_PORT);
 				broker.addConnector("stomp://" + ACTIVEMQ_HOST_NAME + ":" + ACTIVEMQ_STOMP_PORT);
 				broker.start();
 			} catch (Exception e) {
